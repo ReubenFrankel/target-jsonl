@@ -23,6 +23,13 @@ class TargetJSONL(Target):
             description="Path to the target output directory",
             default="output",
         ),
+        th.Property(
+            "overwrite",
+            th.BooleanType(nullable=False),
+            title="Overwrite",
+            description="Overwrite output files atomically",
+            default=False,
+        ),
     ).to_dict()
 
     default_sink_class = JSONLSink
