@@ -24,18 +24,11 @@ plugins:
     - schema-flattening
     - structured-logging
 
-    # TODO: Declare settings and their types here:
     settings:
-    - name: username
-      label: Username
-      description: The username to use for authentication
+    - name: output_dir
+      label: Output Directory
+      description: Path to the target output directory
+      value: output
 
-    - name: password
-      kind: password
-      label: Password
-      description: The password to use for authentication
-      sensitive: true
-
-    # TODO: Declare required settings here:
     settings_group_validation:
-    - [username, password]
+    - [output_dir]
