@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pathlib
-import uuid
 from functools import cached_property
 
 from singer_sdk.singerlib.json import serialize_json
@@ -34,7 +33,7 @@ class JSONLSink(BatchSink):
 
     @cached_property
     def temp_filepath(self):
-        filename = f".{self.filename}.{uuid.uuid4().hex}.tmp"
+        filename = f".{self.filename}.{self.sync_started_at}.tmp"
         return self.output_dir / filename
 
     @override
