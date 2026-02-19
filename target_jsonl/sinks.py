@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import pathlib
+
+from singer_sdk.singerlib.json import serialize_json
 from singer_sdk.sinks import BatchSink
+from typing_extensions import override
 
 
 class JSONLSink(BatchSink):
@@ -10,42 +14,10 @@ class JSONLSink(BatchSink):
 
     max_size = 10000  # Max records to write in one batch
 
-    def start_batch(self, context: dict) -> None:
-        """Start a batch.
+    @override
+    def process_batch(self, context):
+        output_dir = pathlib.Path(self.config["output_dir"]).resolve(strict=True)
+        filepath = output_dir / f"{self.stream_name}.jsonl"
 
-        Developers may optionally add additional markers to the `context` dict,
-        which is unique to this batch.
-
-        Args:
-            context: Stream partition or context dictionary.
-        """
-        # Sample:
-        # ------
-        # batch_key = context["batch_id"]
-        # context["file_path"] = f"{batch_key}.csv"
-
-    def process_record(self, record: dict, context: dict) -> None:
-        """Process the record.
-
-        Developers may optionally read or write additional markers within the
-        passed `context` dict from the current batch.
-
-        Args:
-            record: Individual record in the stream.
-            context: Stream partition or context dictionary.
-        """
-        # Sample:
-        # ------
-        # with open(context["file_path"], "a") as csvfile:
-        #     csvfile.write(record)
-
-    def process_batch(self, context: dict) -> None:
-        """Write out any prepped records and return once fully written.
-
-        Args:
-            context: Stream partition or context dictionary.
-        """
-        # Sample:
-        # ------
-        # client.upload(context["file_path"])  # Upload file
-        # Path(context["file_path"]).unlink()  # Delete local copy
+        with filepath.open("a") as f:
+            f.writelines(serialize_json(r) + "\n" for r in context["records"])
