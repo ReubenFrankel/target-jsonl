@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import pathlib
 from functools import cached_property
 
@@ -39,11 +40,16 @@ class JSONLSink(BatchSink):
     @override
     def process_batch(self, context):
         filepath = self.temp_filepath if self.overwrite else self.filepath
-        lines = [serialize_json(r) for r in context["records"]]
+        lines = (serialize_json(r) for r in context["records"])
 
         try:
+            content = (
+                "\n".join(itertools.chain([line], lines)) + "\n"
+                if (line := next(lines, None))
+                else ""
+            )
+
             with filepath.open("a") as f:
-                content = "\n".join(lines) + "\n" if lines else ""
                 f.write(content)
         except Exception:
             self.temp_filepath.unlink(missing_ok=True)
