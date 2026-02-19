@@ -40,10 +40,12 @@ class JSONLSink(BatchSink):
     @override
     def process_batch(self, context):
         filepath = self.temp_filepath if self.overwrite else self.filepath
+        lines = [serialize_json(r) for r in context["records"]]
 
         try:
             with filepath.open("a") as f:
-                f.writelines(serialize_json(r) + "\n" for r in context["records"])
+                content = "\n".join(lines) + "\n" if lines else ""
+                f.write(content)
         except Exception:
             self.temp_filepath.unlink(missing_ok=True)
             raise
