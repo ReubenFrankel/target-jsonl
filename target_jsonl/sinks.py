@@ -52,7 +52,9 @@ class JSONLSink(BatchSink):
             with filepath.open("a") as f:
                 f.write(content)
         except Exception:
-            self.temp_filepath.unlink(missing_ok=True)
+            if self.overwrite:
+                self.temp_filepath.unlink(missing_ok=True)
+
             raise
 
     @override
